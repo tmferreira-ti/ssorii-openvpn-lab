@@ -401,8 +401,6 @@ chmod 600 /home/ubuntu/vpn-local.tar.gz
 ls -l /home/ubuntu/vpn-local.tar.gz
 ```
 
-Em `tar -C`, não existe espaço entre `-` e `C`. `tar - C` interpreta os dois caracteres como nomes de arquivos e falha.
-
 ## 16. Transferir o pacote pelo Windows
 
 ```bash
