@@ -39,7 +39,7 @@ REDE LOCAL                                                     AWS
 | Servidor privado na AWS | `10.20.2.10` |
 | Rede virtual do OpenVPN | `10.8.0.0/24` |
 | Transporte do OpenVPN | `UDP/1194` |
-| Elastic IP desta execução | `3.93.140.232` |
+| Endereço público do gateway AWS | `IP_ELASTICO_AWS` |
 
 O gateway AWS será o servidor OpenVPN porque possui endereço público fixo. O gateway local será o cliente e iniciará a conexão para a AWS.
 
@@ -105,7 +105,7 @@ Esses itens já são preparados pelo script de infraestrutura deste laboratório
 No Windows, na pasta que contém a chave EC2:
 
 ```cmd
-ssh -i chave.pem ubuntu@3.93.140.232
+ssh -i chave.pem ubuntu@IP_ELASTICO_AWS
 ```
 
 Na instância:
@@ -115,7 +115,7 @@ Na instância:
 sudo -i
 ```
 
-O endereço `3.93.140.232` é o Elastic IP desta execução. Se o laboratório for recriado, use o novo endereço mostrado pelo script.
+`IP_ELASTICO_AWS` é um marcador. Cada aluno deve substituí-lo pelo Elastic IP mostrado pelo script de criação do seu próprio laboratório.
 
 ## 6. Instalar OpenVPN e Easy-RSA
 
@@ -414,7 +414,7 @@ No Windows:
 
 ```cmd
 REM Baixa o pacote da AWS usando a chave da EC2.
-scp -i chave.pem ubuntu@3.93.140.232:/home/ubuntu/vpn-local.tar.gz .
+scp -i chave.pem ubuntu@IP_ELASTICO_AWS:/home/ubuntu/vpn-local.tar.gz .
 
 REM Envia o pacote ao gateway local.
 scp vpn-local.tar.gz root@192.168.56.101:/root/
@@ -510,8 +510,8 @@ dev tun
 proto udp4
 
 # Define o Elastic IP e a porta pública do servidor.
-# Atualize o endereço se a AWS for recriada.
-remote 3.93.140.232 1194
+# Substitua IP_ELASTICO_AWS pelo endereço recebido no laboratório do aluno.
+remote IP_ELASTICO_AWS 1194
 
 # Usa uma porta de origem dinâmica no cliente.
 nobind
