@@ -17,17 +17,7 @@ Ao final da atividade, o aluno deverá ser capaz de:
 
 ## 2. Topologia utilizada
 
-```text
-REDE LOCAL                                                     AWS
-
-172.17.0.0/24                                              10.20.0.0/16
-       |                                                         |
-       | enp0s8: 172.17.0.1                    ens5: 10.20.1.10  |
-[servidor local]---[SSORII-VPN-LOCAL] === Internet === [GATEWAY AWS]---[servidor AWS]
-  172.17.0.2       cliente OpenVPN        UDP/1194    servidor OpenVPN  10.20.2.10
-                            \_____________ 10.8.0.0/24 _____________/
-                                          túnel TUN
-```
+![Topologia da VPN site-to-site entre a rede local e a AWS](./assets/topologia.jpeg)
 
 | Elemento | Endereço ou rede |
 |---|---|

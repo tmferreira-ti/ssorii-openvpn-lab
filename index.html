@@ -54,25 +54,9 @@
       </dl>
     </div>
 
-    <div class="network-card" aria-label="Resumo visual da topologia">
-      <div class="network-zone local-zone">
-        <span class="zone-label">REDE LOCAL</span>
-        <strong>172.17.0.0/24</strong>
-        <div class="node"><span class="node-dot"></span><span>Gateway<br><b>172.17.0.1</b></span></div>
-        <div class="node"><span class="node-dot"></span><span>Logs / NTP<br><b>172.17.0.2</b></span></div>
-      </div>
-      <div class="tunnel">
-        <span>OPENVPN</span>
-        <div class="tunnel-line"><i></i><i></i><i></i></div>
-        <small>10.8.0.0/24</small>
-      </div>
-      <div class="network-zone aws-zone">
-        <span class="zone-label">VPC AWS</span>
-        <strong>10.20.0.0/16</strong>
-        <div class="node"><span class="node-dot"></span><span>Gateway<br><b>10.20.1.10</b></span></div>
-        <div class="node"><span class="node-dot"></span><span>Servidor<br><b>10.20.2.10</b></span></div>
-      </div>
-    </div>
+    <figure class="network-card">
+      <img src="./assets/topologia.jpeg" alt="Topologia da VPN site-to-site entre a rede local 172.17.0.0/24 e a VPC AWS 10.20.0.0/16">
+    </figure>
   </section>
 
   <div class="page-shell">
