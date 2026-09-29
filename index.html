@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Laboratório comentado de VPN site-to-site com OpenVPN entre rede local e AWS.">
+  <meta name="theme-color" content="#071a2b">
+  <title>OpenVPN Site-to-Site | Laboratório Módulo 12</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+
+  <header class="site-header">
+    <a class="brand" href="#inicio" aria-label="Voltar ao início">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" role="img">
+          <path d="M10 15h11l6 9-6 9H10l-6-9 6-9Z"></path>
+          <path d="M27 10h11l6 9-6 9H27l-6-9 6-9Z"></path>
+        </svg>
+      </span>
+      <span>
+        <strong>SSOR II</strong>
+        <small>Módulo 12 · Infraestrutura de segurança</small>
+      </span>
+    </a>
+
+    <div class="header-actions">
+      <button class="icon-button" id="search-button" type="button" aria-label="Pesquisar no guia" title="Pesquisar (Ctrl+K)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.1-5.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"></path></svg>
+      </button>
+      <button class="icon-button" id="theme-button" type="button" aria-label="Alternar tema" title="Alternar tema">
+        <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>
+        <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15.2A9 9 0 1 1 8.8 3 7 7 0 0 0 21 15.2Z"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="hero" id="inicio">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-content">
+      <span class="eyebrow">GUIA PRÁTICO COMENTADO</span>
+      <h1>VPN site-to-site<br><span>com OpenVPN</span></h1>
+      <p>Conecte uma rede local a uma VPC na AWS, entenda cada comando e acompanhe o tráfego da origem ao destino.</p>
+      <div class="hero-actions">
+        <a class="primary-button" href="#laboratorio-comentado-vpn-site-to-site-com-openvpn">Começar laboratório</a>
+        <a class="secondary-button" href="./aws-vpn-lab/HOWTO-OPENVPN-SITE-TO-SITE.md" download>Baixar Markdown</a>
+      </div>
+      <dl class="hero-stats">
+        <div><dt>Transporte</dt><dd>UDP/1194</dd></div>
+        <div><dt>Túnel</dt><dd>10.8.0.0/24</dd></div>
+        <div><dt>Modelo</dt><dd>Site-to-site</dd></div>
+      </dl>
+    </div>
+
+    <div class="network-card" aria-label="Resumo visual da topologia">
+      <div class="network-zone local-zone">
+        <span class="zone-label">REDE LOCAL</span>
+        <strong>172.17.0.0/24</strong>
+        <div class="node"><span class="node-dot"></span><span>Gateway<br><b>172.17.0.1</b></span></div>
+        <div class="node"><span class="node-dot"></span><span>Logs / NTP<br><b>172.17.0.2</b></span></div>
+      </div>
+      <div class="tunnel">
+        <span>OPENVPN</span>
+        <div class="tunnel-line"><i></i><i></i><i></i></div>
+        <small>10.8.0.0/24</small>
+      </div>
+      <div class="network-zone aws-zone">
+        <span class="zone-label">VPC AWS</span>
+        <strong>10.20.0.0/16</strong>
+        <div class="node"><span class="node-dot"></span><span>Gateway<br><b>10.20.1.10</b></span></div>
+        <div class="node"><span class="node-dot"></span><span>Servidor<br><b>10.20.2.10</b></span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="page-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Navegação do guia">
+      <div class="sidebar-heading">
+        <span>CONTEÚDO</span>
+        <button id="close-sidebar" class="close-sidebar" type="button" aria-label="Fechar menu">×</button>
+      </div>
+      <nav id="table-of-contents"></nav>
+    </aside>
+
+    <main class="content-column">
+      <button class="mobile-menu" id="mobile-menu" type="button" aria-controls="sidebar" aria-expanded="false">
+        <span></span><span></span><span></span> Sumário
+      </button>
+
+      <div class="notice" id="runtime-notice" hidden></div>
+      <article class="markdown-body" id="guide" aria-live="polite">
+        <div class="loading-state">
+          <span class="loader" aria-hidden="true"></span>
+          <p>Carregando o laboratório…</p>
+        </div>
+      </article>
+
+      <footer class="content-footer">
+        <p>Segurança em Sistemas Operacionais e Redes de Computadores II</p>
+        <a href="#inicio">Voltar ao início ↑</a>
+      </footer>
+    </main>
+  </div>
+
+  <div class="search-dialog" id="search-dialog" role="dialog" aria-modal="true" aria-labelledby="search-title" hidden>
+    <div class="search-panel">
+      <div class="search-input-row">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.1-5.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"></path></svg>
+        <label class="sr-only" id="search-title" for="search-input">Pesquisar no guia</label>
+        <input id="search-input" type="search" placeholder="Pesquisar comandos, conceitos ou endereços…" autocomplete="off">
+        <kbd>Esc</kbd>
+      </div>
+      <div class="search-results" id="search-results">
+        <p>Digite para pesquisar nas seções do guia.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Comando copiado</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+  <script src="./assets/app.js"></script>
+</body>
+</html>
