@@ -109,7 +109,7 @@ button, input { font: inherit; }
 .hero-stats dt { color: var(--muted); font-size: .7rem; text-transform: uppercase; letter-spacing: .12em; }
 .hero-stats dd { margin: 2px 0 0; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-weight: 700; }
 
-.network-card { margin: 0; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 24px; background: rgba(9, 27, 42, .72); box-shadow: var(--shadow); backdrop-filter: blur(12px); }
+.network-card { width: min(100%, 520px); margin: 0; justify-self: center; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 24px; background: rgba(9, 27, 42, .72); box-shadow: var(--shadow); backdrop-filter: blur(12px); }
 .network-card img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
 [data-theme="light"] .network-card { background: rgba(255,255,255,.8); }
 .network-zone { padding: 18px 20px; border: 1px solid var(--line); border-radius: 14px; background: color-mix(in srgb, var(--surface) 88%, transparent); }
@@ -140,6 +140,8 @@ button, input { font: inherit; }
 .markdown-body h2 { margin: 72px 0 20px; padding-top: 8px; font-size: clamp(1.55rem, 2.5vw, 2.15rem); border-top: 1px solid var(--line); }
 .markdown-body h3 { margin-top: 36px; font-size: 1.25rem; }
 .markdown-body p, .markdown-body li { color: color-mix(in srgb, var(--text) 86%, var(--muted)); }
+.markdown-body p:has(> img) { text-align: center; }
+.markdown-body p > img { display: inline-block; width: min(100%, 720px); height: auto; border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 12px 32px rgba(0,0,0,.14); }
 .markdown-body strong { color: var(--text); }
 .markdown-body hr { height: 1px; margin: 64px 0; border: 0; background: var(--line); }
 .markdown-body blockquote { margin: 24px 0; padding: 14px 18px; border-left: 3px solid var(--warning); border-radius: 0 8px 8px 0; background: color-mix(in srgb, var(--warning) 8%, var(--surface)); }
