@@ -13,7 +13,6 @@ Ao final da atividade, o aluno deverá ser capaz de:
 - diferenciar certificado, chave privada e chave `tls-crypt`;
 - configurar um servidor e um cliente OpenVPN;
 - explicar a diferença entre `route` e `iroute`;
-- preparar roteamento e firewall para comunicação entre redes;
 - diagnosticar a VPN com `ip`, `ss`, `ping`, `journalctl` e `tcpdump`.
 
 ## 2. Topologia utilizada
@@ -613,119 +612,9 @@ Os três testes apresentaram `0% packet loss` no ambiente usado para elaborar es
 
 ---
 
-# Parte C — Encaminhamento da rede local
+# Parte C — Operação e diagnóstico
 
-## 23. Ajustar o nftables do gateway local
-
-O gateway local já possui `/etc/nftables.conf`. Preserve as regras existentes e acrescente as duas permissões da VPN dentro da cadeia `forward`.
-
-Trecho comentado:
-
-```nft
-table inet filter {
-    chain input {
-        # Trata o tráfego destinado ao próprio gateway.
-        type filter hook input priority filter;
-
-        # Mantém o comportamento atual de aceitar entrada.
-        policy accept;
-    }
-
-    chain forward {
-        # Trata pacotes encaminhados entre interfaces.
-        type filter hook forward priority filter;
-
-        # Bloqueia o que não for permitido explicitamente.
-        policy drop;
-
-        # Permite respostas de conexões autorizadas.
-        ct state established,related accept
-
-        # Permite saída da rede local para a Internet.
-        iifname "enp0s8" oifname "enp0s3" accept
-
-        # Permite rede local → VPC AWS pelo túnel.
-        iifname "enp0s8" oifname "tun0" \
-            ip saddr 172.17.0.0/24 ip daddr 10.20.0.0/16 accept
-
-        # Permite VPC AWS → rede local pelo túnel.
-        iifname "tun0" oifname "enp0s8" \
-            ip saddr 10.20.0.0/16 ip daddr 172.17.0.0/24 accept
-    }
-}
-
-table ip nat {
-    chain postrouting {
-        # Executa NAT depois da decisão de roteamento.
-        type nat hook postrouting priority srcnat;
-
-        # Não traduz tráfego que não corresponda à regra.
-        policy accept;
-
-        # Aplica NAT somente na saída normal da Internet.
-        # Como a VPN sai por tun0, ela permanece sem NAT.
-        oifname "enp0s3" masquerade
-    }
-}
-```
-
-Não acrescente outro `flush ruleset` no meio do arquivo. Valide e aplique:
-
-```bash
-# Verifica a sintaxe sem alterar o firewall em execução.
-nft -c -f /etc/nftables.conf
-
-# Recarrega o arquivo depois da validação bem-sucedida.
-systemctl reload nftables
-
-# Mostra as regras efetivamente carregadas no kernel.
-nft list ruleset
-```
-
-## 24. Testar a partir do servidor local
-
-No servidor `172.17.0.2`:
-
-```bash
-# Confirma que 172.17.0.1 é o gateway ou possui a rota para a AWS.
-ip route
-
-# Testa a comunicação completa entre as redes protegidas.
-ping -c 4 10.20.2.10
-
-# Mostra os saltos sem resolver nomes DNS.
-traceroute -n 10.20.2.10
-```
-
-Se `172.17.0.1` não for o gateway padrão, teste temporariamente:
-
-```bash
-# Envia apenas a VPC AWS ao gateway VPN local.
-ip route add 10.20.0.0/16 via 172.17.0.1
-```
-
-## 25. Testar da AWS para a rede local
-
-No servidor privado `10.20.2.10`:
-
-```bash
-# Mostra o roteamento local da instância.
-ip route
-
-# Testa AWS → gateway → túnel → servidor local.
-ping -c 4 172.17.0.2
-
-# Mostra os saltos conhecidos do caminho.
-traceroute -n 172.17.0.2
-```
-
-Esse sentido depende da rota `172.17.0.0/24` na tabela da VPC e do source/destination check desabilitado no gateway AWS.
-
----
-
-# Parte D — Operação e diagnóstico
-
-## 26. Consultar os logs
+## 23. Consultar os logs
 
 No servidor AWS:
 
@@ -749,7 +638,7 @@ journalctl -u openvpn-client@aws -f
 
 A confirmação de inicialização é `Initialization Sequence Completed`.
 
-## 27. Capturar pacotes
+## 24. Capturar pacotes
 
 ```bash
 # Observa pacotes OpenVPN ainda encapsulados na conexão pública.
@@ -759,7 +648,7 @@ tcpdump -ni any udp port 1194
 tcpdump -ni tun0
 ```
 
-## 28. Controlar os serviços
+## 25. Controlar os serviços
 
 Servidor AWS:
 
@@ -781,7 +670,7 @@ systemctl restart openvpn-client@aws
 systemctl is-active openvpn-client@aws
 ```
 
-## 29. Checklist de diagnóstico
+## 26. Checklist de diagnóstico
 
 Se o serviço não iniciar:
 
@@ -798,13 +687,12 @@ Se o túnel conectar, mas as redes não se comunicarem:
 3. confira a rota `172.17.0.0/24` no gateway AWS;
 4. confirme que o arquivo CCD se chama `vpn-local`;
 5. confira `net.ipv4.ip_forward = 1` nos dois gateways;
-6. confira as regras `forward` do nftables;
-7. confira Security Groups e tabela de rotas da AWS;
-8. confirme o source/destination check desabilitado;
-9. use `tcpdump` na `tun0` para localizar onde o pacote para;
-10. confirme que o host de destino permite ICMP ou a porta testada.
+6. confira Security Groups e tabela de rotas da AWS;
+7. confirme o source/destination check desabilitado;
+8. use `tcpdump` na `tun0` para localizar onde o pacote para;
+9. confirme que o host de destino permite ICMP ou a porta testada.
 
-## 30. Fluxo final esperado
+## 27. Fluxo final esperado
 
 ```text
 Servidor AWS 10.20.2.10
@@ -820,7 +708,7 @@ Servidor de logs/NTP 172.17.0.2
 
 Quando o rsyslog for configurado, `10.20.2.10` poderá enviar seus registros para `172.17.0.2` pela VPN, sem publicar o serviço de logs na Internet.
 
-## 31. Questões para os alunos
+## 28. Questões para os alunos
 
 1. Por que o gateway AWS foi escolhido como servidor?
 2. Qual é a diferença entre `10.8.0.0/24` e as redes protegidas?
