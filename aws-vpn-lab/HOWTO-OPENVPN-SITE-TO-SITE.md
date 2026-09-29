@@ -698,17 +698,6 @@ Servidor de logs/NTP 172.17.0.2
 
 Quando o rsyslog for configurado, `10.20.2.10` poderá enviar seus registros para `172.17.0.2` pela VPN, sem publicar o serviço de logs na Internet.
 
-## 28. Questões para os alunos
-
-1. Por que o gateway AWS foi escolhido como servidor?
-2. Qual é a diferença entre `10.8.0.0/24` e as redes protegidas?
-3. Por que o servidor precisa de `route` e `iroute`?
-4. O que ocorreria se as duas redes usassem `172.17.0.0/24`?
-5. Por que não usamos `redirect-gateway`?
-6. O que seria perdido com NAT entre as redes?
-7. Em qual interface aparecem pacotes desencapsulados?
-8. A VPN protege um endpoint já comprometido? Por quê?
-
 ## Referências
 
 - [Manual oficial do OpenVPN 2.6](https://openvpn.net/community-docs/community-articles/openvpn-2-6-manual.html)
