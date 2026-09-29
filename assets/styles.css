@@ -166,6 +166,16 @@ button, input { font: inherit; }
 .notice { width: min(100%, var(--content-w)); margin: 0 auto 24px; padding: 14px 18px; border: 1px solid color-mix(in srgb, var(--warning) 50%, var(--line)); border-radius: 10px; color: var(--warning); background: color-mix(in srgb, var(--warning) 8%, var(--surface)); }
 .mobile-menu { display: none; align-items: center; gap: 6px; margin-bottom: 24px; padding: 8px 12px; color: var(--text); border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
 .mobile-menu span { display: block; width: 14px; height: 1px; background: currentColor; }
+.lesson-slides { width: min(100%, var(--content-w)); margin: 88px auto 0; padding-top: 32px; border-top: 1px solid var(--line); }
+.slides-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+.slides-heading h2 { margin: 10px 0 8px; font-size: clamp(1.7rem, 3vw, 2.35rem); letter-spacing: -.025em; }
+.slides-heading p { max-width: 680px; margin: 0; color: var(--muted); }
+.slides-count { flex: 0 0 auto; padding: 7px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--accent-2); background: var(--surface-2); font: 700 .72rem/1 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.slides-preview { position: relative; display: block; overflow: hidden; width: min(100%, 900px); margin: 0 auto; border: 1px solid var(--line-strong); border-radius: 16px; background: var(--surface-2); box-shadow: var(--shadow); }
+.slides-preview img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; transition: transform .25s ease; }
+.slides-preview span { position: absolute; right: 18px; bottom: 18px; padding: 9px 13px; border: 1px solid rgba(255,255,255,.22); border-radius: 9px; color: white; background: rgba(2, 12, 21, .82); backdrop-filter: blur(8px); font-size: .8rem; font-weight: 750; }
+.slides-preview:hover img { transform: scale(1.012); }
+.slides-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
 .content-footer { width: min(100%, var(--content-w)); margin: 72px auto 0; padding-top: 24px; display: flex; justify-content: space-between; gap: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: .83rem; }
 
 .search-dialog { position: fixed; z-index: 90; inset: 0; padding: 12vh 20px; background: rgba(1, 9, 15, .74); backdrop-filter: blur(8px); }
@@ -203,11 +213,13 @@ button, input { font: inherit; }
   .node { margin-right: 8px; font-size: .72rem; }
   .content-column { padding: 24px 18px 60px; }
   .markdown-body h2 { margin-top: 56px; }
+  .slides-heading { align-items: flex-start; flex-direction: column; }
+  .slides-preview span { right: 10px; bottom: 10px; }
   .content-footer { flex-direction: column; }
 }
 
 @media print {
-  .site-header, .hero, .sidebar, .mobile-menu, .reading-progress, .copy-button, .search-dialog, .toast { display: none !important; }
+  .site-header, .hero, .sidebar, .mobile-menu, .reading-progress, .copy-button, .search-dialog, .toast, .lesson-slides { display: none !important; }
   .page-shell { display: block; }
   .content-column { padding: 0; }
   .markdown-body { width: 100%; }
