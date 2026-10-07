@@ -214,11 +214,16 @@ install -m 644 pki/issued/server.crt /etc/openvpn/server/server.crt
 # Instala a chave privada do servidor com leitura exclusiva do root.
 install -m 600 pki/private/server.key /etc/openvpn/server/server.key
 
+# Permite que o processo OpenVPN sem privilégios atravesse o diretório
+# para consultar o Client Configuration Directory (CCD).
+chmod 711 /etc/openvpn/server
+
 # Confere arquivos e permissões.
+ls -ld /etc/openvpn/server
 ls -l /etc/openvpn/server
 ```
 
-`server.key` e `tls-crypt.key` devem ter permissão `600`.
+O modo `711` permite atravessar `/etc/openvpn/server`, mas não listar seu conteúdo. Isso é necessário porque o OpenVPN passa a executar como `nobody:nogroup` e precisa consultar o CCD quando o cliente se conecta. `server.key` e `tls-crypt.key` continuam com permissão `600`.
 
 ## 12. Criar a configuração específica do cliente
 
@@ -585,7 +590,42 @@ Data Channel: cipher AES-256-GCM
 
 `VERIFY OK` confirma a validação da cadeia de certificados e da finalidade TLS.
 
-## 22. Testar a partir do gateway local
+## 22. Liberar o tráfego entre a LAN e o túnel
+
+No `SSORII-VPN-LOCAL`, a política da cadeia `forward` é `drop`. Libere o encaminhamento nos dois sentidos entre a interface da rede local e a interface do OpenVPN:
+
+```bash
+# Permite que a rede local envie tráfego para o túnel VPN.
+nft add rule inet filter forward iifname "enp0s8" oifname "tun0" accept
+
+# Permite que o tráfego vindo do túnel alcance a rede local.
+nft add rule inet filter forward iifname "tun0" oifname "enp0s8" accept
+
+# Confere as regras efetivamente carregadas na cadeia forward.
+nft list chain inet filter forward
+```
+
+Esses comandos alteram o ruleset em execução. Para manter as regras após reiniciar ou recarregar o firewall, inclua também estas linhas na cadeia `forward` da tabela `inet filter` em `/etc/nftables.conf`:
+
+```nftables
+# Permite LAN -> túnel OpenVPN.
+iifname "enp0s8" oifname "tun0" accept
+
+# Permite túnel OpenVPN -> LAN.
+iifname "tun0" oifname "enp0s8" accept
+```
+
+Valide e recarregue a configuração persistente:
+
+```bash
+# Verifica a sintaxe sem substituir o ruleset atual.
+nft --check --file /etc/nftables.conf
+
+# Recarrega o serviço somente depois da validação.
+systemctl reload nftables
+```
+
+## 23. Testar a partir do gateway local
 
 ```bash
 # Testa os extremos da rede virtual.
@@ -604,7 +644,7 @@ Os três testes apresentaram `0% packet loss` no ambiente usado para elaborar es
 
 # Parte C — Operação e diagnóstico
 
-## 23. Consultar os logs
+## 24. Consultar os logs
 
 No servidor AWS:
 
@@ -628,7 +668,7 @@ journalctl -u openvpn-client@aws -f
 
 A confirmação de inicialização é `Initialization Sequence Completed`.
 
-## 24. Capturar pacotes
+## 25. Capturar pacotes
 
 ```bash
 # Observa pacotes OpenVPN ainda encapsulados na conexão pública.
@@ -638,7 +678,7 @@ tcpdump -ni any udp port 1194
 tcpdump -ni tun0
 ```
 
-## 25. Controlar os serviços
+## 26. Controlar os serviços
 
 Servidor AWS:
 
@@ -660,7 +700,7 @@ systemctl restart openvpn-client@aws
 systemctl is-active openvpn-client@aws
 ```
 
-## 26. Checklist de diagnóstico
+## 27. Checklist de diagnóstico
 
 Se o serviço não iniciar:
 
@@ -682,7 +722,7 @@ Se o túnel conectar, mas as redes não se comunicarem:
 8. use `tcpdump` na `tun0` para localizar onde o pacote para;
 9. confirme que o host de destino permite ICMP ou a porta testada.
 
-## 27. Fluxo final esperado
+## 28. Fluxo final esperado
 
 ```text
 Servidor AWS 10.20.2.10
